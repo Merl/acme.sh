@@ -69,14 +69,14 @@ _dns_do_list_rrs() {
     _err "dns/getZoneDetails domain ${_domain} failed"
     return 1
   fi
-  rrname=$(echo $fulldomain | sed -e "s/\(.*\)\.${_domain}/\1/g")
+  rrname=$(echo "$fulldomain" | sed "s/\(.*\)\.${_domain}/\1/g")
   _debug2 "rrname=$rrname"
   _debug2 "response: ${response}"
   _rr_list="$(echo "${response}" |
-    sed -e 's/,/\n/g' | 
-    grep '"name":"'${rrname} -B1 | 
+    sed 's/,/\n/g' | 
+    grep '"name":"'"${rrname}" -B1 | 
     grep id |
-    sed -e 's/^.*id":\(.*$\)/\1/g')"
+    sed 's/^.*id":\(.*$\)/\1/g')"
 
   _debug2 "RR List: ${_rr_list}"
   [ "${_rr_list}" ]
@@ -115,7 +115,7 @@ _dns_do_rest() {
   _debug2 "JSON response $response"
 
   # retrieve cookie header
-  if [ ! -n "$_H2" ]; then
+  if [ -z "$_H2" ]; then
       _H2="$(_egrep_o 'Cookie: [^;]+' <"$HTTP_HEADER" | _head_n 1)"
   fi
 
@@ -140,7 +140,7 @@ _get_root() {
       return 1
     fi
 
-    _dns_do_rest "dns/getZoneDetails" domain $h
+    _dns_do_rest "dns/getZoneDetails" domain "$h"
     if _contains "${response}" '"stateName":"OK"'; then
       _domain="$h"
       return 0

@@ -50,7 +50,7 @@ dns_dorest_rm() {
 ####################  Private functions below ##################################
 _dns_do_authenticate() {
   _info "Authenticating as ${DO_PID}"
-  
+
   #_dns_do_soap authPartner partner "${DO_PID}" password "${DO_PW}"
   _dns_do_rest "reseller/login" username "${DO_PID}" password "${DO_PW}"
   if _contains "${response}" '"stateName":"OK"'; then
@@ -69,12 +69,13 @@ _dns_do_list_rrs() {
     _err "dns/getZoneDetails domain ${_domain} failed"
     return 1
   fi
-  rrname=$(echo "$fulldomain" | sed "s/\(.*\)\.${_domain}/\1/g")
+  #rrname=$(echo "$fulldomain" | sed "s/\(.*\)\.${_domain}/\1/g")
+  rrname=${fulldomain//.$_domain/}
   _debug2 "rrname=$rrname"
   _debug2 "response: ${response}"
   _rr_list="$(echo "${response}" |
-    sed 's/,/\n/g' | 
-    grep '"name":"'"${rrname}" -B1 | 
+    sed 's/,/\n/g' |
+    grep '"name":"'"${rrname}" -B1 |
     grep id |
     sed 's/^.*id":\(.*$\)/\1/g')"
 
@@ -91,9 +92,9 @@ _dns_do_rest() {
   i=0
   while [ "$1" ]; do
     if [ $i == 0 ]; then
-        delim=""
+      delim=""
     else
-        delim="&"
+      delim="&"
     fi
     _k="$1"
     shift
@@ -116,7 +117,7 @@ _dns_do_rest() {
 
   # retrieve cookie header
   if [ -z "$_H2" ]; then
-      _H2="$(_egrep_o 'Cookie: [^;]+' <"$HTTP_HEADER" | _head_n 1)"
+    _H2="$(_egrep_o 'Cookie: [^;]+' <"$HTTP_HEADER" | _head_n 1)"
   fi
 
   _debug2 "_H2 Cookie: $_H2"

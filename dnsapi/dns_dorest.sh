@@ -117,7 +117,7 @@ _dns_do_rest() {
 
   # retrieve cookie header
   if [ -z "$_H2" ]; then
-    _H2="$(_egrep_o 'Cookie: [^;]+' <"$HTTP_HEADER" | _head_n 1)"
+    _H2="$(_egrep_o '[Cc]ookie: [^;]+' <"$HTTP_HEADER" | _head_n 1)"
   fi
 
   _debug2 "_H2 Cookie: $_H2"
